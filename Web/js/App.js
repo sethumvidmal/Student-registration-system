@@ -6,6 +6,7 @@ const nic = document.getElementById("nic");
 const address = document.getElementById("address");
 
 const btnReg = document.getElementById("btnReg");
+
 btnReg.addEventListener("click",()=>{
     let selGender;
     for(let i = 0; i<gender.length;i++){

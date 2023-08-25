@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url : jdbc:mysql://${MYSQL_HOST:localhost}:3306/institute_crm
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/institute_crm
     username: root
-    password : ICET@1234
+    password: ICET@1234
   jpa:
     hibernate:
       ddl-auto: update
