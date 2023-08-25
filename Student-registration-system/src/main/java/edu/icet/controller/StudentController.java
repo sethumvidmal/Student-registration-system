@@ -18,7 +18,6 @@ public class StudentController {
     @PostMapping
     public void saveStudent(@RequestBody StudentDTO studentDTO) {
         studentService.saveStudent(studentDTO);
-        //return studentDTO;
     }
 
     @GetMapping
