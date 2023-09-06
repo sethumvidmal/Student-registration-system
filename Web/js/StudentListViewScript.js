@@ -15,7 +15,7 @@ fetch("http://localhost:8080/student")
         res.forEach(element => {
             tblBody += `
                         <tr>
-                        <td><button onclick = "studentDetail(${element.id})">${element.id}</button></td>
+                        <td><button onclick = "studentDetail(${element.id})" class="btn btn-success">${element.id}</button></td>
                         <td>${element.firstName}</td>
                         <td>${element.lastName}</td>
                         <td>${element.age}</td>
@@ -32,13 +32,13 @@ function studentDetail(id) {
     fetch(`http://localhost:8080/student/${id}`)
         .then(response => response.json())
         .then(res => {
-            //console.log(res.firstName);
+            
             let tblBody = "";
 
             res.forEach(element => {
                 tblBody += 
                     `<tr>
-                            <td><button onclick = "studentDetail(${element.id})">${element.id}</button></td>
+                            <td>${element.id}</td>
                             <td>${element.firstName}</td>
                             <td>${element.lastName}</td>
                             <td>${element.age}</td>
