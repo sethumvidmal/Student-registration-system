@@ -31,5 +31,11 @@ public class StudentServiceImpl implements StudentService {
     public List<StudentEntity> getAllStudents() {
         return (List<StudentEntity>) studentRepository.findAll();
     }
+
+    @Override
+    public List<StudentEntity> getStudentById(int id) {
+        return studentRepository.findById(id);
+    }
+
 }
 
