@@ -4,22 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/LoginFormStyle.css">
+    <link rel="stylesheet" href="css/bootstrap.css">
     <title>Document</title>
 </head>
 <body>
-    <div class="container">
-        <p class="logo">Login</p><br>
-        <div class="userNamePassword">
-            <input type="text" placeholder="User name"><br>
-            <input type="password" id="password" placeholder="Password"><br>
-            <div>
-                <input type="checkbox" onclick="showPassword()">Show password 
-            </div><br><br>
-            <button class="btn">Sign in</button><br>
-            <a href="registerForm.html">
-                <button class="btn" id="btnSignUp">Sign up</button>
-            </a>
-        </div>
+    <div>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+            <a class="navbar-brand" href="#">Login</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="StudentListView.html">Students</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="loginForm.html">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="registerForm.html">Register</a>
+                <!-- </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+                </li> -->
+                </ul>
+            </div>
+            </div>
+        </nav>
+    </div>
+    <!-- <div class="align"> -->
+        <div class="loginContainer">
+            <p class="logo">Login</p><br>
+            <div class="userNamePassword">
+                <input type="text" placeholder="User name"><br>
+                <input type="password" id="password" placeholder="Password"><br>
+                <div>
+                    <input type="checkbox" onclick="showPassword()">Show password 
+                </div><br><br>
+                <button class="btnSign">Sign in</button><br>
+                <a href="registerForm.html">
+                    <button class="btnSign" id="btnSignUp">Sign up</button>
+                </a>
+            </div>
+        <!-- </div> -->
     </div>
     <script src="/js/LoginFormScript.js"></script>
 </body>

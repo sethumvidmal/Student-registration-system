@@ -2,15 +2,24 @@
 
 body{
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
     height: 100vh;
     background: url(https://images.unsplash.com/photo-1544306094-e2dcf9479da3) no-repeat;
     background-attachment: fixed;
 }
-.container{
+
+.align{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.loginContainer{
+    position: absolute;
+    margin-left: 550px;
+    margin-top: 90px;
     width: 450px;
-    height: 425px;
+    height: 450px;
     box-shadow: 0 0 1rem 0 rgba(0, 0, 0, .2); 
     border-radius: 10px;
     position: relative;
@@ -18,7 +27,7 @@ body{
     background: inherit;
     overflow: hidden;
 }
-.container:before{
+.loginContainer:before{
     content: "";
     position: absolute;
     background: inherit;
@@ -32,6 +41,7 @@ body{
     margin: -20px;
 }
 .logo{
+    margin-top: 12px;
     text-align: center;
     font-size: xx-large;
     font-family: 'Alfa Slab One', cursive;
@@ -54,7 +64,7 @@ input:hover{
     transition-duration: 0.4s;
     box-shadow: 0 5px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
 }
-.btn{
+.btnSign{
     background-color: rgba(4,109,120,255);
     color: beige;
     transition-duration: 0.4s;
@@ -63,7 +73,7 @@ input:hover{
     border-radius: 8px;
     font-weight: 700;
 }
-.btn:hover{
+.btnSign:hover{
     background-color: rgba(109, 177, 177, 0.751);
     color: black;
     border: 1px;
