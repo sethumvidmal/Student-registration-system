@@ -37,15 +37,52 @@ function studentDetail(id) {
 
             res.forEach(element => {
                 tblBody += 
-                    `<tr>
-                            <td>${element.id}</td>
-                            <td>${element.firstName}</td>
-                            <td>${element.lastName}</td>
-                            <td>${element.age}</td>
-                            <td>${element.gender}</td>
-                            <td>${element.address}</td>
-                            <td>${element.nic}</td>
-                            </tr>`;
+                    `<table>
+                        <tr>
+                            <td>
+                                Id:
+                            </td>
+                            <td>
+                                ${element.id}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>First name :</td>
+                            <td>
+                                ${element.firstName}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Last name:</td>
+                            <td>
+                                ${element.lastName}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Gender :</td>
+                            <td>
+                                ${element.gender}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Age :</td>
+                            <td>
+                                ${element.age}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>NIC :</td>
+                            <td>
+                                ${element.nic}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Address :</td>
+                            <td>
+                                ${element.address}
+                                </tr>
+                            </td>
+                </table>`;
             });
             studentTable.innerHTML = tblBody;
         })
