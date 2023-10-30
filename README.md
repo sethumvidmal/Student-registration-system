@@ -29,4 +29,4 @@ This application provides the basic functions of a student management system. Ad
 2. **Clone the Repository**:
 
    ```bash
-   git clone https://github.com/your-username/your-repo.git
+   git clone https://github.com/sethumvidmal/Student-registration-system.git
