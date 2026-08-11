@@ -37,5 +37,20 @@ public class StudentServiceImpl implements StudentService {
         return studentRepository.findById(id);
     }
 
+    @Override
+    public boolean deleteStudent(int id) {
+        if (studentRepository.existsById(id)) {
+            studentRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void updateStudent(StudentDTO studentDTO) {
+        if (studentDTO.getId() != 0 && studentRepository.existsById(studentDTO.getId())) {
+            studentRepository.save(modelMapper.map(studentDTO, StudentEntity.class));
+        }
+    }
 }
 

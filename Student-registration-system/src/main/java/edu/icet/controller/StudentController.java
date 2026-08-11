@@ -29,4 +29,14 @@ public class StudentController {
     public List<StudentEntity> getStudentById(@PathVariable String id){
         return studentService.getStudentById(Integer.valueOf(id));
     }
+
+    @PutMapping
+    public void updateStudent(@RequestBody StudentDTO studentDTO) {
+        studentService.updateStudent(studentDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public boolean deleteStudent(@PathVariable Integer id) {
+        return studentService.deleteStudent(id);
+    }
 }

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Directory | Registration System</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon">🎓</div>
+        <span>EduManage</span>
+      </a>
+
+      <button class="mobile-toggle" id="mobile-menu-toggle" aria-label="Toggle navigation">
+        ☰
+      </button>
+
+      <ul class="nav-links" id="nav-links">
+        <li><a href="index.html" class="nav-link active">👥 Students</a></li>
+        <li><a href="registerForm.html" class="nav-link nav-cta">➕ Register Student</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    
+    <!-- Page Header -->
+    <header class="page-header">
+      <div class="page-title">
+        <h1>Student Directory</h1>
+        <p>View, filter, edit and manage registered students in real-time</p>
+      </div>
+      <a href="registerForm.html" class="btn btn-primary">
+        <span>✨ Add New Student</span>
+      </a>
+    </header>
+
+    <!-- Stats Overview -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon total">🎓</div>
+        <div class="stat-info">
+          <h3 id="stat-total">0</h3>
+          <p>Total Students</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon male">👨</div>
+        <div class="stat-info">
+          <h3 id="stat-male">0</h3>
+          <p>Male Students</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon female">👩</div>
+        <div class="stat-info">
+          <h3 id="stat-female">0</h3>
+          <p>Female Students</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Toolbar (Search & Filter) -->
+    <section class="filter-bar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="Search by name, NIC, or location...">
+      </div>
+
+      <select id="gender-filter" class="filter-select">
+        <option value="all">All Genders</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+
+      <div class="view-toggle">
+        <button id="view-grid-btn" class="toggle-btn active" title="Grid View">📱 Grid</button>
+        <button id="view-table-btn" class="toggle-btn" title="Table View">📄 Table</button>
+      </div>
+    </section>
+
+    <!-- Container for Grid Cards -->
+    <div id="students-container">
+      <div id="students-grid" class="students-grid">
+        <!-- Student cards rendered dynamically -->
+      </div>
+
+      <!-- Container for Table View -->
+      <div id="table-view-wrapper" class="table-container">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Full Name</th>
+              <th>Gender</th>
+              <th>Age</th>
+              <th>NIC</th>
+              <th>Address</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="students-table-body">
+            <!-- Table rows rendered dynamically -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="empty-state" style="display: none;">
+        <div class="empty-icon">📂</div>
+        <h3>No Students Found</h3>
+        <p>No records match your search criteria, or no students have been registered yet.</p>
+        <a href="registerForm.html" class="btn btn-primary">Register First Student</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal: View Student Details -->
+  <div id="details-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Student Profile</h3>
+        <button class="modal-close" onclick="closeModal('details-modal')">✕</button>
+      </div>
+      <div class="modal-body" id="details-modal-content">
+        <!-- Details populated dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('details-modal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Edit Student -->
+  <div id="edit-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Edit Student Details</h3>
+        <button class="modal-close" onclick="closeModal('edit-modal')">✕</button>
+      </div>
+      <form id="edit-student-form">
+        <div class="modal-body">
+          <input type="hidden" id="edit-id">
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">First Name</label>
+              <input type="text" id="edit-firstName" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name</label>
+              <input type="text" id="edit-lastName" class="form-input" required>
+            </div>
+            <div class="form-group full-width">
+              <label class="form-label">Gender</label>
+              <div class="gender-radio-group">
+                <div class="radio-pill">
+                  <input type="radio" id="edit-male" name="edit-gender" value="Male" checked>
+                  <label for="edit-male">Male</label>
+                </div>
+                <div class="radio-pill">
+                  <input type="radio" id="edit-female" name="edit-gender" value="Female">
+                  <label for="edit-female">Female</label>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Age</label>
+              <input type="number" id="edit-age" class="form-input" min="1" max="120" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">NIC</label>
+              <input type="text" id="edit-nic" class="form-input" required>
+            </div>
+            <div class="form-group full-width">
+              <label class="form-label">Address</label>
+              <input type="text" id="edit-address" class="form-input" required>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('edit-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Delete Confirmation -->
+  <div id="delete-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 420px;">
+      <div class="modal-header">
+        <h3>Confirm Delete</h3>
+        <button class="modal-close" onclick="closeModal('delete-modal')">✕</button>
+      </div>
+      <div class="modal-body" style="text-align: center; padding: 2rem 1.5rem;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+        <h4 style="margin-bottom: 0.5rem; font-size: 1.15rem;">Are you sure?</h4>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">This action cannot be undone. The student record will be permanently deleted from the database.</p>
+      </div>
+      <div class="modal-footer" style="justify-content: center;">
+        <button class="btn btn-secondary" onclick="closeModal('delete-modal')">Cancel</button>
+        <button class="btn btn-danger" onclick="executeDeleteStudent()">Yes, Delete Student</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -9,4 +9,6 @@ public interface StudentService {
     public void saveStudent(StudentDTO studentDTO);
     public List<StudentEntity> getAllStudents();
     public List<StudentEntity> getStudentById(int id);
+    public boolean deleteStudent(int id);
+    public void updateStudent(StudentDTO studentDTO);
 }
