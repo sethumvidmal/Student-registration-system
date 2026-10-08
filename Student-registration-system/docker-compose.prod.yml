@@ -1,0 +1,24 @@
+# Server deployment: docker compose -f docker-compose.prod.yml up -d --build
+#
+# Uses the host's network so the backend reaches MariaDB on 127.0.0.1 while MariaDB keeps
+# listening on localhost only. Spring binds to 127.0.0.1:8080, so only nginx on the same
+# machine can reach it. All settings come from .env (see .env.example).
+services:
+  backend:
+    build: .
+    image: student-registration-backend
+    container_name: student-registration-backend
+    network_mode: host
+    env_file: .env
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      SERVER_ADDRESS: 127.0.0.1
+      SERVER_PORT: ${APP_PORT:-8080}
+      # Trust X-Forwarded-* from nginx so Swagger and redirects use the public https URL
+      SERVER_FORWARD_HEADERS_STRATEGY: framework
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"

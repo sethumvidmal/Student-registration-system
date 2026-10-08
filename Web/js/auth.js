@@ -5,7 +5,11 @@
  * Load this before ui.js on every page.
  */
 
-const AUTH_API_URL = "http://localhost:8080/auth";
+// Local dev serves these pages on their own port (e.g. Live Server on 5501) and the API on 8080.
+// Deployed, nginx serves the pages and proxies the API on the same origin.
+const IS_LOCAL_DEV = ["localhost", "127.0.0.1"].includes(window.location.hostname) && window.location.port !== "8080";
+const API_ROOT = IS_LOCAL_DEV ? "http://localhost:8080" : window.location.origin;
+const AUTH_API_URL = `${API_ROOT}/auth`;
 const SESSION_KEY = "edumanage.session";
 const LOGIN_PAGE = "login.html";
 const HOME_PAGE = "index.html";

@@ -5,7 +5,7 @@
  * Load after icons.js and auth.js, before the page script.
  */
 
-const API_ROOT = "http://localhost:8080";
+// API_ROOT comes from auth.js
 const STUDENT_API = `${API_ROOT}/student`;
 const API_DOCS_URL = `${API_ROOT}/swagger-ui/index.html`;
 const THEME_KEY = "edumanage.theme";
