@@ -1,14 +1,14 @@
 package edu.icet.service;
 
+import edu.icet.dto.PageResponse;
 import edu.icet.dto.StudentDTO;
-import edu.icet.entity.StudentEntity;
-
-import java.util.List;
+import edu.icet.dto.StudentSearchRequest;
 
 public interface StudentService {
-    public void saveStudent(StudentDTO studentDTO);
-    public List<StudentEntity> getAllStudents();
-    public List<StudentEntity> getStudentById(int id);
-    public boolean deleteStudent(int id);
-    public void updateStudent(StudentDTO studentDTO);
+    /** Creates the student when {@code id} is null, otherwise updates the student with that id. */
+    StudentDTO saveStudent(StudentDTO studentDTO);
+
+    PageResponse<StudentDTO> searchStudents(StudentSearchRequest request);
+
+    void deleteStudent(int id);
 }

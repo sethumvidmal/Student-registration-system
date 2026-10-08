@@ -1,0 +1,18 @@
+services:
+  backend:
+    build: .
+    image: student-registration-backend
+    container_name: student-registration-backend
+    ports:
+      - "8080:8080"
+    # Lets the container reach MySQL running on the host machine
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:${DB_PORT:-3306}/${DB_NAME:-institute_crm}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME:-root}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-12345}
+      JWT_SECRET: ${JWT_SECRET:-dev-access-secret-change-me-0123456789abcdef}
+      REFRESH_JWT_SECRET: ${REFRESH_JWT_SECRET:-dev-refresh-secret-change-me-0123456789abcdef}
+    restart: unless-stopped

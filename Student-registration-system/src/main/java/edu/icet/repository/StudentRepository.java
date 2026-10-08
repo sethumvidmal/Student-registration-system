@@ -1,11 +1,11 @@
 package edu.icet.repository;
 
 import edu.icet.entity.StudentEntity;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import java.util.List;
+public interface StudentRepository extends JpaRepository<StudentEntity, Integer>, JpaSpecificationExecutor<StudentEntity> {
+    boolean existsByNicIgnoreCase(String nic);
 
-public interface StudentRepository extends CrudRepository<StudentEntity,Integer> {
-    List<StudentEntity> findById(int id);
-
+    boolean existsByNicIgnoreCaseAndIdNot(String nic, int id);
 }
