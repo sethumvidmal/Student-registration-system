@@ -1,5 +1,6 @@
 package edu.icet.exception;
 
+import edu.icet.dto.ApiError;
 import edu.icet.dto.ApiResponse;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.RequestDispatcher;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Replaces Spring Boot's default /error page so errors raised outside controllers
- * (unknown URLs, filter failures) still use the { status, message, data } wrapper.
+ * (unknown URLs, filter failures) still use the standard ApiResponse wrapper.
  */
 @Hidden
 @RestController
@@ -26,9 +27,12 @@ public class ApiErrorController implements ErrorController {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
 
-        String message = status == HttpStatus.NOT_FOUND
-                ? "No endpoint found for " + request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI)
-                : status.getReasonPhrase();
-        return ResponseEntity.status(status).body(ApiResponse.of(status, message, null));
+        if (status == HttpStatus.NOT_FOUND) {
+            String message = "No endpoint found for " + request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
+            return ResponseEntity.status(status)
+                    .body(ApiResponse.failure(message, new ApiError(ErrorCode.ENDPOINT_NOT_FOUND.name())));
+        }
+        return ResponseEntity.status(status)
+                .body(ApiResponse.failure(status.getReasonPhrase(), new ApiError(GlobalExceptionHandler.codeFor(status))));
     }
 }

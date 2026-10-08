@@ -8,9 +8,9 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface AuthIdentityRepository extends CrudRepository<AuthIdentityEntity, Integer> {
-    Optional<AuthIdentityEntity> findFirstByUserIdAndDeletedFalse(Integer userId);
+    Optional<AuthIdentityEntity> findFirstByUserId(Integer userId);
 
     /** True while the user is active and holds an unexpired refresh-token session (i.e. has not logged out). */
-    boolean existsByUserIdAndDeletedFalseAndStatusAndRefreshTokenExpiresAtAfter(
+    boolean existsByUserIdAndStatusAndRefreshTokenExpiresAtAfter(
             Integer userId, UserStatus status, LocalDateTime now);
 }

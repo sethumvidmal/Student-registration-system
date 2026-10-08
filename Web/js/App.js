@@ -2,17 +2,21 @@
  * Student Registration System - Frontend App Logic
  * Backend URL: http://localhost:8080/student
  * API calls go through authFetch() from auth.js, which adds the JWT.
- * Every response is wrapped as { status, message, data }.
+ * Every response is wrapped as { success, message, data } or { success, message, error }.
  */
 
 const API_BASE_URL = "http://localhost:8080/student";
 const GENDER_LABELS = { M: "Male", F: "Female" };
+const PAGE_SIZE = 12;
+const SEARCH_PLACEHOLDERS = { name: "Search by name...", nic: "Search by NIC...", id: "Search by student ID..." };
 
 // Global State
-let studentsList = [];
-let filteredStudents = [];
+let studentsList = []; // students on the current page
+let currentPage = 0;
+let totalPages = 0;
 let currentViewMode = "grid"; // 'grid' or 'table'
 let currentDeleteId = null;
+let searchDebounce = null;
 
 // DOM Load Handler
 document.addEventListener("DOMContentLoaded", () => {
@@ -73,23 +77,36 @@ function showToast(message, type = "success") {
    DIRECTORY PAGE LOGIC (index.html)
    ========================================== */
 function initDirectoryPage() {
+  loadStats();
   loadStudents();
 
-  // Search Listener
+  // Search Listener: wait until the user stops typing before querying the server
   const searchInput = document.getElementById("search-input");
   if (searchInput) {
     searchInput.addEventListener("input", () => {
-      filterStudents();
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(() => loadStudents(0), 300);
+    });
+  }
+
+  // Search Field Listener
+  const searchField = document.getElementById("search-field");
+  if (searchField) {
+    searchField.addEventListener("change", () => {
+      if (searchInput) searchInput.placeholder = SEARCH_PLACEHOLDERS[searchField.value];
+      if (searchInput?.value.trim()) loadStudents(0);
     });
   }
 
   // Gender Filter Listener
   const genderFilter = document.getElementById("gender-filter");
   if (genderFilter) {
-    genderFilter.addEventListener("change", () => {
-      filterStudents();
-    });
+    genderFilter.addEventListener("change", () => loadStudents(0));
   }
+
+  // Pagination Listeners
+  document.getElementById("page-prev")?.addEventListener("click", () => loadStudents(currentPage - 1));
+  document.getElementById("page-next")?.addEventListener("click", () => loadStudents(currentPage + 1));
 
   // View Toggle Listeners
   const gridBtn = document.getElementById("view-grid-btn");
@@ -107,16 +124,69 @@ function initDirectoryPage() {
   }
 }
 
-async function loadStudents() {
+/** Builds a /student/list URL from the given filters; empty filters are left out. */
+function studentListUrl(filters) {
+  const params = new URLSearchParams();
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") params.set(key, value);
+  });
+  return `${API_BASE_URL}/list?${params}`;
+}
+
+function currentFilters(page) {
+  const field = document.getElementById("search-field")?.value || "name";
+  const term = (document.getElementById("search-input")?.value || "").trim();
+  const gender = document.getElementById("gender-filter")?.value || "all";
+  return {
+    [field]: term,
+    gender: gender === "all" ? "" : gender,
+    page,
+    size: PAGE_SIZE
+  };
+}
+
+async function loadStudents(page = currentPage) {
+  const filters = currentFilters(page);
+  // An id that is not a positive number cannot match anyone, so skip the request
+  if (filters.id && !/^[1-9]\d*$/.test(filters.id)) {
+    studentsList = [];
+    totalPages = 0;
+    renderStudents();
+    return;
+  }
+
   showSkeletons();
   try {
-    const data = await apiRequest(API_BASE_URL);
-    studentsList = Array.isArray(data) ? data : [];
-    filterStudents();
+    const result = await apiRequest(studentListUrl(filters));
+    // Deleting the last student on a page leaves it empty: step back a page
+    if (result.items.length === 0 && result.page > 0) {
+      return loadStudents(result.page - 1);
+    }
+    studentsList = result.items;
+    currentPage = result.page;
+    totalPages = result.totalPages;
+    renderStudents();
   } catch (error) {
     console.error("Error fetching students:", error);
-    showToast("Could not connect to backend server. Make sure Spring Boot is running on port 8080.", "error");
+    showToast(error instanceof TypeError
+      ? "Could not connect to backend server. Make sure Spring Boot is running on port 8080."
+      : error.message, "error");
+    studentsList = [];
+    totalPages = 0;
     renderEmptyState();
+  }
+}
+
+/** Overall counts for the stat cards, independent of the current search. */
+async function loadStats() {
+  const count = async (gender) => (await apiRequest(studentListUrl({ gender, size: 1 }))).totalItems;
+  try {
+    const [total, male, female] = await Promise.all([count(""), count("M"), count("F")]);
+    document.getElementById("stat-total").textContent = total;
+    document.getElementById("stat-male").textContent = male;
+    document.getElementById("stat-female").textContent = female;
+  } catch (error) {
+    console.error("Error fetching stats:", error);
   }
 }
 
@@ -126,35 +196,17 @@ function renderEmptyState() {
   if (gridContainer) gridContainer.style.display = "none";
   if (document.getElementById("table-view-wrapper")) document.getElementById("table-view-wrapper").classList.remove("active");
   if (emptyState) emptyState.style.display = "block";
+  renderPagination();
 }
 
-function filterStudents() {
-  const searchTerm = (document.getElementById("search-input")?.value || "").toLowerCase().trim();
-  const selectedGender = document.getElementById("gender-filter")?.value || "all";
+function renderPagination() {
+  const pagination = document.getElementById("pagination");
+  if (!pagination) return;
 
-  filteredStudents = studentsList.filter((student) => {
-    const fullName = `${student.firstName || ''} ${student.lastName || ''}`.toLowerCase();
-    const nic = (student.nic || '').toLowerCase();
-    const address = (student.address || '').toLowerCase();
-    
-    const matchesSearch = fullName.includes(searchTerm) || nic.includes(searchTerm) || address.includes(searchTerm);
-    const matchesGender = selectedGender === "all" || student.gender === selectedGender;
-
-    return matchesSearch && matchesGender;
-  });
-
-  updateStats();
-  renderStudents();
-}
-
-function updateStats() {
-  const totalEl = document.getElementById("stat-total");
-  const maleEl = document.getElementById("stat-male");
-  const femaleEl = document.getElementById("stat-female");
-
-  if (totalEl) totalEl.textContent = studentsList.length;
-  if (maleEl) maleEl.textContent = studentsList.filter(s => s.gender === 'M').length;
-  if (femaleEl) femaleEl.textContent = studentsList.filter(s => s.gender === 'F').length;
+  pagination.style.display = totalPages > 1 ? "flex" : "none";
+  document.getElementById("page-info").textContent = `Page ${currentPage + 1} of ${totalPages}`;
+  document.getElementById("page-prev").disabled = currentPage <= 0;
+  document.getElementById("page-next").disabled = currentPage >= totalPages - 1;
 }
 
 function renderStudents() {
@@ -162,17 +214,18 @@ function renderStudents() {
   const tableContainer = document.getElementById("students-table-body");
   const emptyState = document.getElementById("empty-state");
 
-  if (filteredStudents.length === 0) {
+  if (studentsList.length === 0) {
     renderEmptyState();
     return;
   }
 
   if (emptyState) emptyState.style.display = "none";
+  renderPagination();
 
   // Render Grid Cards
   if (gridContainer) {
     gridContainer.style.display = currentViewMode === "grid" ? "grid" : "none";
-    gridContainer.innerHTML = filteredStudents.map((student) => `
+    gridContainer.innerHTML = studentsList.map((student) => `
       <div class="student-card">
         <div class="card-header">
           <div class="avatar-wrapper">
@@ -218,7 +271,7 @@ function renderStudents() {
     const wrapper = document.getElementById("table-view-wrapper");
     if (wrapper) wrapper.classList.toggle("active", currentViewMode === "table");
 
-    tableContainer.innerHTML = filteredStudents.map((student) => `
+    tableContainer.innerHTML = studentsList.map((student) => `
       <tr>
         <td><strong>#${student.id}</strong></td>
         <td>${escapeHtml(student.firstName)} ${escapeHtml(student.lastName)}</td>
@@ -259,7 +312,7 @@ function showSkeletons() {
    ========================================== */
 async function viewStudentDetails(id) {
   try {
-    const student = await apiRequest(`${API_BASE_URL}/${id}`);
+    const student = (await apiRequest(studentListUrl({ id }))).items[0];
 
     if (!student) {
       showToast("Student not found", "error");
@@ -339,17 +392,18 @@ async function handleUpdateStudent(e) {
     return;
   }
 
-  const updatedStudent = { firstName, lastName, gender, age, nic, address };
+  const updatedStudent = { id, firstName, lastName, gender, age, nic, address };
 
   try {
-    await apiRequest(`${API_BASE_URL}/${id}`, {
-      method: "PUT",
+    await apiRequest(`${API_BASE_URL}/create`, {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedStudent)
     });
 
     showToast("Student details updated successfully!");
     closeModal("edit-modal");
+    loadStats();
     loadStudents();
   } catch (err) {
     showToast(err.message || "Failed to update student", "error");
@@ -365,13 +419,14 @@ async function executeDeleteStudent() {
   if (!currentDeleteId) return;
 
   try {
-    await apiRequest(`${API_BASE_URL}/${currentDeleteId}`, {
+    await apiRequest(`${API_BASE_URL}/delete/${currentDeleteId}`, {
       method: "DELETE"
     });
 
     showToast("Student removed successfully");
     closeModal("delete-modal");
     currentDeleteId = null;
+    loadStats();
     loadStudents();
   } catch (err) {
     showToast(err.message || "Failed to delete student", "error");
@@ -414,7 +469,7 @@ async function handleRegisterStudent(e) {
   }
 
   try {
-    await apiRequest(API_BASE_URL, {
+    await apiRequest(`${API_BASE_URL}/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newStudent)
@@ -446,11 +501,18 @@ function formReset() {
    HELPER UTILITIES
    ========================================== */
 
-/** Calls the API and returns the unwrapped `data`; throws with the server's message on failure. */
+/**
+ * Calls the API and returns the unwrapped `data`. On failure it throws with the
+ * server's message, or the field messages of a validation error (422).
+ */
 async function apiRequest(url, options = {}) {
   const res = await authFetch(url, options);
   const body = await res.json().catch(() => null);
-  if (!res.ok) throw new Error(body?.message || `Request failed (${res.status})`);
+  if (!res.ok || body?.success === false) {
+    const fieldMessages = Object.values(body?.error?.fields || {});
+    const message = fieldMessages.length ? fieldMessages.join(", ") : body?.message;
+    throw new Error(message || `Request failed (${res.status})`);
+  }
   return body?.data;
 }
 

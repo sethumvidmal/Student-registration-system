@@ -70,9 +70,15 @@
 
     <!-- Toolbar (Search & Filter) -->
     <section class="filter-bar">
+      <select id="search-field" class="filter-select" aria-label="Search by">
+        <option value="name">Name</option>
+        <option value="nic">NIC</option>
+        <option value="id">ID</option>
+      </select>
+
       <div class="search-box">
         <span class="search-icon">🔍</span>
-        <input type="text" id="search-input" placeholder="Search by name, NIC, or location...">
+        <input type="text" id="search-input" placeholder="Search by name...">
       </div>
 
       <select id="gender-filter" class="filter-select">
@@ -111,6 +117,13 @@
             <!-- Table rows rendered dynamically -->
           </tbody>
         </table>
+      </div>
+
+      <!-- Pagination -->
+      <div id="pagination" class="pagination" style="display: none;">
+        <button type="button" id="page-prev" class="btn btn-secondary">← Prev</button>
+        <span id="page-info" class="page-info"></span>
+        <button type="button" id="page-next" class="btn btn-secondary">Next →</button>
       </div>
 
       <!-- Empty State -->
@@ -204,7 +217,7 @@
       <div class="modal-body" style="text-align: center; padding: 2rem 1.5rem;">
         <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
         <h4 style="margin-bottom: 0.5rem; font-size: 1.15rem;">Are you sure?</h4>
-        <p style="color: var(--text-muted); font-size: 0.9rem;">This action cannot be undone. The student record will be permanently deleted from the database.</p>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">The student will be removed from the directory.</p>
       </div>
       <div class="modal-footer" style="justify-content: center;">
         <button class="btn btn-secondary" onclick="closeModal('delete-modal')">Cancel</button>

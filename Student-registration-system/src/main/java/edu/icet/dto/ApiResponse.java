@@ -1,24 +1,31 @@
 package edu.icet.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
 
-/** Envelope for every API response, success or error: { status, message, data }. */
+/**
+ * Envelope for every API response.
+ * Success: { "success": true,  "message": "...", "data": {...} }
+ * Failure: { "success": false, "message": "...", "error": { "code": "...", "fields": {...} } }
+ * The HTTP status code carries the outcome; the body never repeats it.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
-    private int status;
+    private boolean success;
     private String message;
     private T data;
+    private ApiError error;
 
-    public static <T> ApiResponse<T> of(HttpStatus status, String message, T data) {
-        return new ApiResponse<>(status.value(), message, data);
+    public static <T> ApiResponse<T> success(String message, T data) {
+        return new ApiResponse<>(true, message, data, null);
     }
 
-    public static <T> ApiResponse<T> ok(String message, T data) {
-        return of(HttpStatus.OK, message, data);
+    public static ApiResponse<Void> failure(String message, ApiError error) {
+        return new ApiResponse<>(false, message, null, error);
     }
 }

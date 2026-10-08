@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,23 +28,23 @@ public class AuthController {
     @SecurityRequirements // public: no bearer token needed
     @PostMapping("/login")
     public ApiResponse<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
-        return new ApiResponse<>(HttpStatus.OK.value(), "User logged in successfully", authService.login(request));
+        return ApiResponse.success("User logged in successfully", authService.login(request));
     }
 
     @SecurityRequirements // public: no bearer token needed
     @PostMapping("/refresh-token")
     public ApiResponse<AuthResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
-        return new ApiResponse<>(HttpStatus.OK.value(), "Generated new access token", authService.refreshToken(request));
+        return ApiResponse.success("Generated new access token", authService.refreshToken(request));
     }
 
     @PostMapping("/logout")
     public ApiResponse<Void> logout(@AuthenticationPrincipal AuthUser authUser) {
         authService.logout(authUser);
-        return new ApiResponse<>(HttpStatus.OK.value(), "User logged out successfully", null);
+        return ApiResponse.success("User logged out successfully", null);
     }
 
     @GetMapping("/me")
     public ApiResponse<UserDTO> me(@AuthenticationPrincipal AuthUser authUser) {
-        return new ApiResponse<>(HttpStatus.OK.value(), "Current user", authService.getCurrentUser(authUser));
+        return ApiResponse.success("Current user", authService.getCurrentUser(authUser));
     }
 }

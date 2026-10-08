@@ -1,11 +1,11 @@
 package edu.icet.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.icet.util.Gender;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StudentDTO {
-    // Assigned by the server; ignored in request bodies
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    // Omit to create a student; set to update the student with this id
+    @Positive(message = "Id must be a positive number")
     private Integer id;
 
     @NotBlank(message = "First name is required")

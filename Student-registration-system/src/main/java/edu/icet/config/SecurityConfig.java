@@ -1,7 +1,9 @@
 package edu.icet.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.icet.dto.ApiError;
 import edu.icet.dto.ApiResponse;
+import edu.icet.exception.ErrorCode;
 import edu.icet.repository.AuthIdentityRepository;
 import edu.icet.security.JwtAuthenticationFilter;
 import edu.icet.security.JwtService;
@@ -9,7 +11,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -51,9 +52,9 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint((request, response, e) -> writeError(response, objectMapper,
-                                HttpStatus.UNAUTHORIZED, "Authentication required: access token is missing, invalid or expired"))
+                                ErrorCode.UNAUTHORIZED, "Authentication required: access token is missing, invalid or expired"))
                         .accessDeniedHandler((request, response, e) -> writeError(response, objectMapper,
-                                HttpStatus.FORBIDDEN, "Access denied")))
+                                ErrorCode.ACCESS_DENIED, "Access denied")))
                 // Built here rather than as a @Component so Spring Boot does not also register it as a servlet filter
                 .addFilterBefore(new JwtAuthenticationFilter(jwtService, authIdentityRepository),
                         UsernamePasswordAuthenticationFilter.class);
@@ -77,9 +78,10 @@ public class SecurityConfig {
     }
 
     private static void writeError(HttpServletResponse response, ObjectMapper objectMapper,
-                                   HttpStatus status, String message) throws IOException {
-        response.setStatus(status.value());
+                                   ErrorCode errorCode, String message) throws IOException {
+        response.setStatus(errorCode.getStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        objectMapper.writeValue(response.getOutputStream(), new ApiResponse<>(status.value(), message, null));
+        objectMapper.writeValue(response.getOutputStream(),
+                ApiResponse.failure(message, new ApiError(errorCode.name())));
     }
 }

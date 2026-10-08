@@ -59,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        boolean sessionActive = authIdentityRepository.existsByUserIdAndDeletedFalseAndStatusAndRefreshTokenExpiresAtAfter(
+        boolean sessionActive = authIdentityRepository.existsByUserIdAndStatusAndRefreshTokenExpiresAtAfter(
                 authUser.id(), UserStatus.ACTIVE, LocalDateTime.now());
         if (!sessionActive) {
             return;
