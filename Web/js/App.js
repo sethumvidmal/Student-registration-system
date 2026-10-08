@@ -2,9 +2,11 @@
  * Student Registration System - Frontend App Logic
  * Backend URL: http://localhost:8080/student
  * API calls go through authFetch() from auth.js, which adds the JWT.
+ * Every response is wrapped as { status, message, data }.
  */
 
 const API_BASE_URL = "http://localhost:8080/student";
+const GENDER_LABELS = { M: "Male", F: "Female" };
 
 // Global State
 let studentsList = [];
@@ -108,9 +110,7 @@ function initDirectoryPage() {
 async function loadStudents() {
   showSkeletons();
   try {
-    const response = await authFetch(API_BASE_URL);
-    if (!response.ok) throw new Error("Failed to fetch students");
-    const data = await response.json();
+    const data = await apiRequest(API_BASE_URL);
     studentsList = Array.isArray(data) ? data : [];
     filterStudents();
   } catch (error) {
@@ -138,7 +138,7 @@ function filterStudents() {
     const address = (student.address || '').toLowerCase();
     
     const matchesSearch = fullName.includes(searchTerm) || nic.includes(searchTerm) || address.includes(searchTerm);
-    const matchesGender = selectedGender === "all" || (student.gender || '').toLowerCase() === selectedGender.toLowerCase();
+    const matchesGender = selectedGender === "all" || student.gender === selectedGender;
 
     return matchesSearch && matchesGender;
   });
@@ -153,8 +153,8 @@ function updateStats() {
   const femaleEl = document.getElementById("stat-female");
 
   if (totalEl) totalEl.textContent = studentsList.length;
-  if (maleEl) maleEl.textContent = studentsList.filter(s => (s.gender || '').toLowerCase() === 'male').length;
-  if (femaleEl) femaleEl.textContent = studentsList.filter(s => (s.gender || '').toLowerCase() === 'female').length;
+  if (maleEl) maleEl.textContent = studentsList.filter(s => s.gender === 'M').length;
+  if (femaleEl) femaleEl.textContent = studentsList.filter(s => s.gender === 'F').length;
 }
 
 function renderStudents() {
@@ -182,7 +182,7 @@ function renderStudents() {
               <span class="student-id">ID: #${student.id}</span>
             </div>
           </div>
-          <span class="badge badge-gender-${(student.gender || 'male').toLowerCase()}">${escapeHtml(student.gender || 'N/A')}</span>
+          ${genderBadge(student.gender)}
         </div>
         <div class="card-details">
           <div class="detail-item">
@@ -222,7 +222,7 @@ function renderStudents() {
       <tr>
         <td><strong>#${student.id}</strong></td>
         <td>${escapeHtml(student.firstName)} ${escapeHtml(student.lastName)}</td>
-        <td><span class="badge badge-gender-${(student.gender || 'male').toLowerCase()}">${escapeHtml(student.gender || 'N/A')}</span></td>
+        <td>${genderBadge(student.gender)}</td>
         <td>${student.age}</td>
         <td><code>${escapeHtml(student.nic)}</code></td>
         <td>${escapeHtml(student.address)}</td>
@@ -259,10 +259,7 @@ function showSkeletons() {
    ========================================== */
 async function viewStudentDetails(id) {
   try {
-    const res = await authFetch(`${API_BASE_URL}/${id}`);
-    if (!res.ok) throw new Error("Could not fetch details");
-    const data = await res.json();
-    const student = Array.isArray(data) ? data[0] : data;
+    const student = await apiRequest(`${API_BASE_URL}/${id}`);
 
     if (!student) {
       showToast("Student not found", "error");
@@ -277,7 +274,7 @@ async function viewStudentDetails(id) {
             ${escapeHtml(getInitials(student.firstName, student.lastName))}
           </div>
           <h2 style="font-size: 1.5rem; font-weight: 700;">${escapeHtml(student.firstName)} ${escapeHtml(student.lastName)}</h2>
-          <span class="badge badge-gender-${(student.gender || 'male').toLowerCase()}">${escapeHtml(student.gender)}</span>
+          ${genderBadge(student.gender)}
         </div>
         <div style="background: rgba(10,13,20,0.5); border-radius: var(--radius-md); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.8rem; border: 1px solid var(--glass-border);">
           <div style="display: flex; justify-content: space-between;">
@@ -301,7 +298,7 @@ async function viewStudentDetails(id) {
     }
     openModal("details-modal");
   } catch (err) {
-    showToast("Error loading student details", "error");
+    showToast(err.message || "Error loading student details", "error");
   }
 }
 
@@ -318,7 +315,7 @@ function openEditModal(id) {
 
   const genderRadios = document.getElementsByName("edit-gender");
   genderRadios.forEach(radio => {
-    radio.checked = (radio.value.toLowerCase() === (student.gender || '').toLowerCase());
+    radio.checked = radio.value === student.gender;
   });
 
   openModal("edit-modal");
@@ -333,7 +330,7 @@ async function handleUpdateStudent(e) {
   const nic = document.getElementById("edit-nic").value.trim();
   const address = document.getElementById("edit-address").value.trim();
   
-  let gender = "Male";
+  let gender = "M";
   const genderRadios = document.getElementsByName("edit-gender");
   genderRadios.forEach(r => { if (r.checked) gender = r.value; });
 
@@ -342,22 +339,20 @@ async function handleUpdateStudent(e) {
     return;
   }
 
-  const updatedStudent = { id, firstName, lastName, gender, age, nic, address };
+  const updatedStudent = { firstName, lastName, gender, age, nic, address };
 
   try {
-    const res = await authFetch(API_BASE_URL, {
+    await apiRequest(`${API_BASE_URL}/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedStudent)
     });
 
-    if (!res.ok) throw new Error("Update failed");
-
     showToast("Student details updated successfully!");
     closeModal("edit-modal");
     loadStudents();
   } catch (err) {
-    showToast("Failed to update student", "error");
+    showToast(err.message || "Failed to update student", "error");
   }
 }
 
@@ -370,18 +365,16 @@ async function executeDeleteStudent() {
   if (!currentDeleteId) return;
 
   try {
-    const res = await authFetch(`${API_BASE_URL}/${currentDeleteId}`, {
+    await apiRequest(`${API_BASE_URL}/${currentDeleteId}`, {
       method: "DELETE"
     });
-
-    if (!res.ok) throw new Error("Delete failed");
 
     showToast("Student removed successfully");
     closeModal("delete-modal");
     currentDeleteId = null;
     loadStudents();
   } catch (err) {
-    showToast("Failed to delete student", "error");
+    showToast(err.message || "Failed to delete student", "error");
   }
 }
 
@@ -404,7 +397,7 @@ async function handleRegisterStudent(e) {
   const nic = document.getElementById("nic").value.trim();
   const address = document.getElementById("address").value.trim();
   
-  let gender = "Male";
+  let gender = "M";
   const genderRadios = document.getElementsByName("gender");
   genderRadios.forEach(r => { if (r.checked) gender = r.value; });
 
@@ -421,13 +414,11 @@ async function handleRegisterStudent(e) {
   }
 
   try {
-    const res = await authFetch(API_BASE_URL, {
+    await apiRequest(API_BASE_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newStudent)
     });
-
-    if (!res.ok) throw new Error("Registration failed");
 
     showToast("Student registered successfully! Redirecting...");
     formReset();
@@ -436,7 +427,9 @@ async function handleRegisterStudent(e) {
       window.location.href = "index.html";
     }, 1200);
   } catch (err) {
-    showToast("Failed to register student. Please check backend connection.", "error");
+    showToast(err instanceof TypeError
+      ? "Failed to register student. Please check backend connection."
+      : err.message, "error");
   } finally {
     if (submitBtn) {
       submitBtn.disabled = false;
@@ -452,6 +445,20 @@ function formReset() {
 /* ==========================================
    HELPER UTILITIES
    ========================================== */
+
+/** Calls the API and returns the unwrapped `data`; throws with the server's message on failure. */
+async function apiRequest(url, options = {}) {
+  const res = await authFetch(url, options);
+  const body = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(body?.message || `Request failed (${res.status})`);
+  return body?.data;
+}
+
+function genderBadge(gender) {
+  const cssClass = gender === "F" ? "female" : "male";
+  return `<span class="badge badge-gender-${cssClass}">${escapeHtml(GENDER_LABELS[gender] || "N/A")}</span>`;
+}
+
 function openModal(id) {
   document.getElementById(id)?.classList.add("active");
 }

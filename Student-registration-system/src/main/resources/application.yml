@@ -1,6 +1,10 @@
 spring :
   profiles :
     active : dev
+  jackson :
+    mapper :
+      # Accept "m"/"f" as well as "M"/"F" for enums such as gender
+      accept-case-insensitive-enums : true
 
 jwt:
   # Override both secrets via environment variables outside local dev (min 32 chars each)

@@ -1,14 +1,17 @@
 package edu.icet.service;
 
 import edu.icet.dto.StudentDTO;
-import edu.icet.entity.StudentEntity;
 
 import java.util.List;
 
 public interface StudentService {
-    public void saveStudent(StudentDTO studentDTO);
-    public List<StudentEntity> getAllStudents();
-    public List<StudentEntity> getStudentById(int id);
-    public boolean deleteStudent(int id);
-    public void updateStudent(StudentDTO studentDTO);
+    StudentDTO saveStudent(StudentDTO studentDTO);
+
+    List<StudentDTO> getAllStudents();
+
+    StudentDTO getStudentById(int id);
+
+    StudentDTO updateStudent(int id, StudentDTO studentDTO);
+
+    void deleteStudent(int id);
 }

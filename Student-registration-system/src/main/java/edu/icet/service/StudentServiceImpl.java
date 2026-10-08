@@ -3,59 +3,70 @@ package edu.icet.service;
 import edu.icet.dto.StudentDTO;
 import edu.icet.entity.StudentEntity;
 import edu.icet.repository.StudentRepository;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class StudentServiceImpl implements StudentService {
-    @Value("instituteName")
-    String instituteName;
-    @Autowired
-    public StudentRepository studentRepository;
-    @Autowired
-    ModelMapper modelMapper;
+    private final StudentRepository studentRepository;
 
     @Override
-    public void saveStudent(StudentDTO studentDTO) {
-        if (studentDTO.getFirstName() == null || studentDTO.getLastName() == null || studentDTO.getGender() == null || studentDTO.getAge() == 0 || studentDTO.getNic() == null || studentDTO.getAddress() == null) {
-            return;
-        }
-        studentRepository.save(modelMapper.map(studentDTO, StudentEntity.class));
+    @Transactional
+    public StudentDTO saveStudent(StudentDTO studentDTO) {
+        StudentEntity student = new StudentEntity();
+        copyToEntity(studentDTO, student);
+        return toDTO(studentRepository.save(student));
     }
 
     @Override
-    public List<StudentEntity> getAllStudents() {
-        return (List<StudentEntity>) studentRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<StudentDTO> getAllStudents() {
+        return studentRepository.findAll().stream().map(StudentServiceImpl::toDTO).toList();
     }
 
     @Override
-    public List<StudentEntity> getStudentById(int id) {
-        return studentRepository.findById(id);
+    @Transactional(readOnly = true)
+    public StudentDTO getStudentById(int id) {
+        return toDTO(findStudent(id));
     }
 
     @Override
-    public boolean deleteStudent(int id) {
-        if (studentRepository.existsById(id)) {
-            studentRepository.deleteById(id);
-            return true;
-        }
-        return false;
+    @Transactional
+    public StudentDTO updateStudent(int id, StudentDTO studentDTO) {
+        // Update the loaded entity so audit columns and version are preserved
+        StudentEntity student = findStudent(id);
+        copyToEntity(studentDTO, student);
+        return toDTO(studentRepository.save(student));
     }
 
     @Override
-    public void updateStudent(StudentDTO studentDTO) {
-        if (studentDTO.getId() == 0) {
-            return;
-        }
-        // Map onto the loaded entity so audit columns and version are preserved
-        studentRepository.findById(studentDTO.getId()).stream().findFirst().ifPresent(student -> {
-            modelMapper.map(studentDTO, student);
-            studentRepository.save(student);
-        });
+    @Transactional
+    public void deleteStudent(int id) {
+        studentRepository.delete(findStudent(id));
+    }
+
+    private StudentEntity findStudent(int id) {
+        return studentRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found with id " + id));
+    }
+
+    private static void copyToEntity(StudentDTO dto, StudentEntity entity) {
+        entity.setFirstName(dto.getFirstName().trim());
+        entity.setLastName(dto.getLastName().trim());
+        entity.setGender(dto.getGender());
+        entity.setAge(dto.getAge());
+        entity.setNic(dto.getNic().trim());
+        entity.setAddress(dto.getAddress().trim());
+    }
+
+    private static StudentDTO toDTO(StudentEntity entity) {
+        return new StudentDTO(entity.getId(), entity.getFirstName(), entity.getLastName(),
+                entity.getGender(), entity.getAge(), entity.getNic(), entity.getAddress());
     }
 }
-
