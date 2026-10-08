@@ -5,12 +5,13 @@ services:
     container_name: student-registration-backend
     ports:
       - "8080:8080"
-    # Lets the container reach MySQL running on the host machine
+    # Lets the container reach a database running on the host machine (DB_HOST=host.docker.internal)
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
-      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:${DB_PORT:-3306}/${DB_NAME:-institute_crm}
+      # DB_VENDOR is mariadb (servers) or mysql (local MySQL); it picks the JDBC driver and Hibernate dialect
+      SPRING_DATASOURCE_URL: jdbc:${DB_VENDOR:-mariadb}://${DB_HOST:-host.docker.internal}:${DB_PORT:-3306}/${DB_NAME:-institute_crm}
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME:-root}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-12345}
       JWT_SECRET: ${JWT_SECRET:-dev-access-secret-change-me-0123456789abcdef}
