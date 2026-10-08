@@ -32,7 +32,8 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    private static final String[] PUBLIC_ENDPOINTS = {"/auth/login", "/auth/refresh-token", "/error"};
+    private static final String[] PUBLIC_ENDPOINTS = {"/auth/login", "/auth/refresh-token", "/error",
+            "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**"};
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtService jwtService,

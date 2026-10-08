@@ -7,6 +7,8 @@ import edu.icet.dto.RefreshTokenRequest;
 import edu.icet.dto.UserDTO;
 import edu.icet.security.AuthUser;
 import edu.icet.service.AuthService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,17 +19,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Authentication")
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
 
+    @SecurityRequirements // public: no bearer token needed
     @PostMapping("/login")
     public ApiResponse<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return new ApiResponse<>(HttpStatus.OK.value(), "User logged in successfully", authService.login(request));
     }
 
+    @SecurityRequirements // public: no bearer token needed
     @PostMapping("/refresh-token")
     public ApiResponse<AuthResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
         return new ApiResponse<>(HttpStatus.OK.value(), "Generated new access token", authService.refreshToken(request));
