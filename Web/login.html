@@ -3,49 +3,96 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login | Registration System</title>
+  <meta name="color-scheme" content="light dark">
+  <title>Sign in · EduManage</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%235b5bd6'/%3E%3Cpath d='M27 13v6M5 13l11-5 11 5-11 5zM10 15.5v5c3.5 3 8.5 3 12 0v-5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="css/styles.css">
+  <script>
+    // Apply the saved theme before first paint to avoid a flash
+    (function () { try { var t = localStorage.getItem("edumanage.theme"); if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t); } catch (e) {} })();
+  </script>
 </head>
-<body>
+<body data-page="login">
+  <div class="auth-layout">
+    <section class="auth-brand">
+      <span class="glow glow-1"></span>
+      <span class="glow glow-2"></span>
+      <span class="glow glow-3"></span>
+      <div class="auth-brand-inner">
+        <span class="brand">
+          <span class="brand-mark"><i data-icon="graduation-cap" data-size="17"></i></span>
+          <span>EduManage</span>
+        </span>
 
-  <!-- Navigation Bar -->
-  <nav class="navbar">
-    <div class="nav-container">
-      <a href="login.html" class="brand-logo">
-        <div class="brand-icon">🎓</div>
-        <span>EduManage</span>
-      </a>
-    </div>
-  </nav>
+        <div class="auth-hero">
+          <span class="eyebrow"><i data-icon="sparkles" data-size="14"></i>Student registration system</span>
+          <h1>Every student.<br>One clear record.</h1>
+          <p>Register, find and manage students across your institute. Fast, secure and always up to date.</p>
+          <ul class="auth-features">
+            <li><span class="feature-icon"><i data-icon="zap" data-size="15"></i></span>Find anyone instantly by name, NIC or ID</li>
+            <li><span class="feature-icon"><i data-icon="shield-check" data-size="15"></i></span>Secured with JWT and automatic session refresh</li>
+            <li><span class="feature-icon"><i data-icon="history" data-size="15"></i></span>Soft delete with a full audit trail</li>
+          </ul>
+        </div>
 
-  <!-- Main Content -->
-  <main class="main-content">
-    <div class="form-container login-container">
-      <div class="form-title">
-        <h2>Welcome Back</h2>
-        <p>Sign in to manage student registrations</p>
+        <div class="mock" aria-hidden="true">
+          <div class="mock-bar"><i></i><i></i><i></i><span>Students</span></div>
+          <div class="mock-row"><span class="avatar avatar-sm" style="--h:262">AP</span>Amaya Perera<span class="badge">Female</span><span class="mono">#1024</span></div>
+          <div class="mock-row"><span class="avatar avatar-sm" style="--h:200">KS</span>Kavindu Silva<span class="badge">Male</span><span class="mono">#1025</span></div>
+          <div class="mock-row"><span class="avatar avatar-sm" style="--h:330">NF</span>Nethmi Fernando<span class="badge">Female</span><span class="mono">#1026</span></div>
+        </div>
+
+        <p class="auth-legal">© 2026 EduManage</p>
       </div>
+    </section>
 
-      <form id="login-form" class="login-form">
-        <div class="form-group">
-          <label class="form-label" for="emailOrPhone">Email or Phone</label>
-          <input type="text" id="emailOrPhone" class="form-input" placeholder="e.g. admin@icet.lk" required autocomplete="username">
-        </div>
+    <section class="auth-panel">
+      <button type="button" class="btn btn-ghost btn-icon auth-theme" data-theme-toggle></button>
 
-        <div class="form-group">
-          <label class="form-label" for="password">Password</label>
-          <input type="password" id="password" class="form-input" placeholder="Your password" required autocomplete="current-password">
-        </div>
+      <div class="auth-card">
+        <span class="brand brand-mobile">
+          <span class="brand-mark"><i data-icon="graduation-cap" data-size="17"></i></span>
+          <span>EduManage</span>
+        </span>
 
-        <p id="login-error" class="form-error" role="alert"></p>
+        <h2>Sign in</h2>
+        <p class="lead">Welcome back. Enter your details to continue.</p>
 
-        <button type="submit" id="btn-login" class="btn btn-primary login-submit">
-          🔐 Sign In
-        </button>
-      </form>
-    </div>
-  </main>
+        <div class="alert alert-error" id="login-error" role="alert" hidden></div>
 
+        <form class="auth-form" id="login-form" novalidate>
+          <div class="field">
+            <label class="label" for="emailOrPhone">Email or phone</label>
+            <div class="input-group">
+              <i data-icon="user" data-size="16"></i>
+              <input class="input" id="emailOrPhone" name="emailOrPhone" placeholder="you@institute.lk" autocomplete="username" autofocus>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="password">Password</label>
+            <div class="input-group">
+              <i data-icon="lock" data-size="16"></i>
+              <input class="input has-action" id="password" name="password" type="password" placeholder="Your password" autocomplete="current-password">
+              <button type="button" class="btn btn-ghost btn-icon btn-sm input-action" id="toggle-password" aria-label="Show password" aria-pressed="false"><i data-icon="eye"></i></button>
+            </div>
+            <p class="caps-hint" id="caps-hint" hidden><i data-icon="alert-triangle" data-size="13"></i>Caps Lock is on</p>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg btn-block" id="btn-login"><span>Sign in</span><i data-icon="arrow-right" data-size="16"></i></button>
+        </form>
+
+        <p class="auth-foot"><i data-icon="shield-check" data-size="15"></i>Your session is encrypted and refreshes automatically.</p>
+      </div>
+    </section>
+  </div>
+
+  <script src="js/icons.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/login.js"></script>
 </body>
 </html>

@@ -3,95 +3,133 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Student Registration | Registration System</title>
+  <meta name="color-scheme" content="light dark">
+  <title>Register student · EduManage</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%235b5bd6'/%3E%3Cpath d='M27 13v6M5 13l11-5 11 5-11 5zM10 15.5v5c3.5 3 8.5 3 12 0v-5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="css/styles.css">
+  <script>
+    // Apply the saved theme before first paint to avoid a flash
+    (function () { try { var t = localStorage.getItem("edumanage.theme"); if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t); } catch (e) {} })();
+  </script>
 </head>
-<body>
+<body data-page="register" data-title="Register student">
+  <div class="app">
+    <aside class="sidebar" id="sidebar" aria-label="Sidebar"></aside>
 
-  <!-- Navigation Bar -->
-  <nav class="navbar">
-    <div class="nav-container">
-      <a href="index.html" class="brand-logo">
-        <div class="brand-icon">🎓</div>
-        <span>EduManage</span>
-      </a>
+    <div class="main">
+      <header class="topbar" id="topbar"></header>
 
-      <button class="mobile-toggle" id="mobile-menu-toggle" aria-label="Toggle navigation">
-        ☰
-      </button>
-
-      <ul class="nav-links" id="nav-links">
-        <li><a href="index.html" class="nav-link">👥 Students</a></li>
-        <li><a href="registerForm.html" class="nav-link active nav-cta">➕ Register Student</a></li>
-        <li><span class="nav-user" id="nav-user"></span></li>
-        <li><button type="button" class="nav-link nav-logout" id="logout-btn">🚪 Logout</button></li>
-      </ul>
-    </div>
-  </nav>
-
-  <!-- Main Content -->
-  <main class="main-content">
-    <div class="form-container">
-      <div class="form-title">
-        <h2>New Student Registration</h2>
-        <p>Enter details below to register a new student into the system</p>
-      </div>
-
-      <form id="student-register-form">
-        <div class="form-grid">
-          
-          <div class="form-group">
-            <label class="form-label" for="firstName">First Name</label>
-            <input type="text" id="firstName" class="form-input" placeholder="e.g. John" required autocomplete="off">
+      <main class="content" id="main">
+        <header class="page-header">
+          <div>
+            <h1 class="page-title">Register student</h1>
+            <p class="page-subtitle">Add a new student to the directory. Every field is required.</p>
           </div>
+        </header>
 
-          <div class="form-group">
-            <label class="form-label" for="lastName">Last Name</label>
-            <input type="text" id="lastName" class="form-input" placeholder="e.g. Doe" required autocomplete="off">
-          </div>
+        <div class="form-layout">
+          <form class="panel" id="register-form" novalidate>
+            <section class="form-section">
+              <div class="form-section-head">
+                <h2>Personal details</h2>
+                <p>Name, gender and age as they appear on official documents.</p>
+              </div>
+              <div class="form-grid">
+                <div class="field">
+                  <label class="label" for="firstName">First name</label>
+                  <input class="input" id="firstName" name="firstName" placeholder="e.g. Nimal" autocomplete="off">
+                  <p class="field-error" data-error-for="firstName" hidden></p>
+                </div>
+                <div class="field">
+                  <label class="label" for="lastName">Last name</label>
+                  <input class="input" id="lastName" name="lastName" placeholder="e.g. Perera" autocomplete="off">
+                  <p class="field-error" data-error-for="lastName" hidden></p>
+                </div>
+                <div class="field">
+                  <span class="label" id="gender-label">Gender</span>
+                  <div class="segmented segmented-block" role="radiogroup" aria-labelledby="gender-label">
+                    <label><input type="radio" name="gender" value="M"><span><i data-icon="mars" data-size="14"></i>Male</span></label>
+                    <label><input type="radio" name="gender" value="F"><span><i data-icon="venus" data-size="14"></i>Female</span></label>
+                  </div>
+                  <p class="field-error" data-error-for="gender" hidden></p>
+                </div>
+                <div class="field">
+                  <label class="label" for="age">Age</label>
+                  <input class="input" id="age" name="age" type="number" inputmode="numeric" min="1" max="120" placeholder="e.g. 21">
+                  <p class="field-error" data-error-for="age" hidden></p>
+                </div>
+              </div>
+            </section>
 
-          <div class="form-group full-width">
-            <label class="form-label">Gender</label>
-            <div class="gender-radio-group">
-              <div class="radio-pill">
-                <input type="radio" id="gender-male" name="gender" value="M" checked>
-                <label for="gender-male">👨 Male</label>
+            <section class="form-section">
+              <div class="form-section-head">
+                <h2>Identity &amp; address</h2>
+                <p>The NIC identifies the student and must be unique across the directory.</p>
               </div>
-              <div class="radio-pill">
-                <input type="radio" id="gender-female" name="gender" value="F">
-                <label for="gender-female">👩 Female</label>
+              <div class="form-grid">
+                <div class="field span-2">
+                  <div class="label-row">
+                    <label class="label" for="nic">National Identity Card (NIC)</label>
+                    <span class="hint">e.g. 200012345678 or 991234567V</span>
+                  </div>
+                  <input class="input mono" id="nic" name="nic" placeholder="200012345678" autocomplete="off" spellcheck="false">
+                  <p class="field-error" data-error-for="nic" hidden></p>
+                </div>
+                <div class="field span-2">
+                  <label class="label" for="address">Address</label>
+                  <textarea class="textarea" id="address" name="address" rows="3" placeholder="e.g. 123 Galle Road, Colombo 03"></textarea>
+                  <p class="field-error" data-error-for="address" hidden></p>
+                </div>
               </div>
+            </section>
+
+            <footer class="form-actions">
+              <span class="form-hint"><kbd class="kbd" id="mod-key">Ctrl</kbd><kbd class="kbd">Enter</kbd> to register</span>
+              <a class="btn btn-secondary" href="index.html"><span>Cancel</span></a>
+              <button type="submit" class="btn btn-primary" id="register-submit"><i data-icon="user-plus" data-size="15"></i><span>Register student</span></button>
+            </footer>
+          </form>
+
+          <aside class="preview" aria-label="Preview">
+            <p class="preview-label"><span class="live-dot"></span>Live preview</p>
+            <article class="student-card preview-card" aria-hidden="true">
+              <div class="student-card-head"><span id="preview-avatar"></span><span id="preview-badge"></span></div>
+              <div>
+                <h3 id="preview-name"></h3>
+                <p class="cell-sub mono">New student</p>
+              </div>
+              <div class="meta-list">
+                <p class="meta-row"><i data-icon="cake" data-size="15"></i><span id="preview-age"></span></p>
+                <p class="meta-row"><i data-icon="id-card" data-size="15"></i><span class="mono" id="preview-nic"></span></p>
+                <p class="meta-row"><i data-icon="map-pin" data-size="15"></i><span id="preview-address"></span></p>
+              </div>
+            </article>
+
+            <div class="panel completeness">
+              <div class="completeness-head"><span>Fields completed</span><strong id="completeness-count">0 of 6</strong></div>
+              <div class="meter"><span id="completeness-bar"></span></div>
             </div>
-          </div>
 
-          <div class="form-group">
-            <label class="form-label" for="age">Age</label>
-            <input type="number" id="age" class="form-input" placeholder="e.g. 21" min="10" max="100" required>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="nic">National Identity Card (NIC)</label>
-            <input type="text" id="nic" class="form-input" placeholder="e.g. 200012345678" required autocomplete="off">
-          </div>
-
-          <div class="form-group full-width">
-            <label class="form-label" for="address">Address</label>
-            <input type="text" id="address" class="form-input" placeholder="e.g. 123 Main Street, Colombo" required autocomplete="off">
-          </div>
-
+            <div class="panel tips">
+              <h3><i data-icon="lightbulb" data-size="15"></i>Good to know</h3>
+              <ul>
+                <li>Duplicate NICs are rejected, so each student is registered only once.</li>
+                <li>Every detail can be edited later from the student's profile.</li>
+                <li>Press <kbd class="kbd">/</kbd> on the students page or open the command palette to find anyone instantly.</li>
+              </ul>
+            </div>
+          </aside>
         </div>
-
-        <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
-          <a href="index.html" class="btn btn-secondary">Cancel</a>
-          <button type="submit" id="btnReg" class="btn btn-primary" style="padding: 0.75rem 2rem;">
-            ✨ Register Student
-          </button>
-        </div>
-      </form>
+      </main>
     </div>
-  </main>
+  </div>
 
+  <script src="js/icons.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/register.js"></script>
 </body>
 </html>

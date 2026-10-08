@@ -1,8 +1,8 @@
 /**
- * Student Registration System - Authentication
+ * EduManage - authentication.
  * Stores the JWT session, attaches it to API calls, refreshes it when the
  * access token expires and redirects to the login page when it ends.
- * Load this before app.js on every page.
+ * Load this before ui.js on every page.
  */
 
 const AUTH_API_URL = "http://localhost:8080/auth";
@@ -108,53 +108,4 @@ async function authFetch(url, options = {}) {
 
   if (res.status === 401) redirectToLogin();
   return res;
-}
-
-/* ==========================================
-   PAGE WIRING
-   ========================================== */
-document.addEventListener("DOMContentLoaded", () => {
-  if (isLoginPage) {
-    if (getSession()) {
-      window.location.replace(HOME_PAGE);
-      return;
-    }
-    initLoginForm();
-    return;
-  }
-
-  const user = getSession()?.user;
-  const userLabel = document.getElementById("nav-user");
-  if (userLabel && user) {
-    userLabel.textContent = `👤 ${[user.firstName, user.lastName].filter(Boolean).join(" ")}`;
-  }
-
-  const logoutBtn = document.getElementById("logout-btn");
-  if (logoutBtn) logoutBtn.addEventListener("click", logout);
-});
-
-function initLoginForm() {
-  const form = document.getElementById("login-form");
-  const errorEl = document.getElementById("login-error");
-  const submitBtn = document.getElementById("btn-login");
-
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    errorEl.textContent = "";
-    submitBtn.disabled = true;
-
-    try {
-      await login(
-        document.getElementById("emailOrPhone").value.trim(),
-        document.getElementById("password").value
-      );
-      window.location.replace(HOME_PAGE);
-    } catch (error) {
-      errorEl.textContent = error instanceof TypeError
-        ? "Could not connect to backend server. Make sure Spring Boot is running on port 8080."
-        : error.message;
-    } finally {
-      submitBtn.disabled = false;
-    }
-  });
 }

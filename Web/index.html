@@ -3,230 +3,108 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Student Directory | Registration System</title>
+  <meta name="color-scheme" content="light dark">
+  <title>Students · EduManage</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%235b5bd6'/%3E%3Cpath d='M27 13v6M5 13l11-5 11 5-11 5zM10 15.5v5c3.5 3 8.5 3 12 0v-5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="css/styles.css">
+  <script>
+    // Apply the saved theme before first paint to avoid a flash
+    (function () { try { var t = localStorage.getItem("edumanage.theme"); if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t); } catch (e) {} })();
+  </script>
 </head>
-<body>
+<body data-page="students" data-title="Students">
+  <div class="app">
+    <aside class="sidebar" id="sidebar" aria-label="Sidebar"></aside>
 
-  <!-- Navigation Bar -->
-  <nav class="navbar">
-    <div class="nav-container">
-      <a href="index.html" class="brand-logo">
-        <div class="brand-icon">🎓</div>
-        <span>EduManage</span>
-      </a>
+    <div class="main">
+      <header class="topbar" id="topbar"></header>
 
-      <button class="mobile-toggle" id="mobile-menu-toggle" aria-label="Toggle navigation">
-        ☰
-      </button>
+      <main class="content" id="main">
+        <header class="page-header">
+          <div>
+            <h1 class="page-title">Students</h1>
+            <p class="page-subtitle">Search, review and manage every registered student.</p>
+          </div>
+          <div class="page-actions">
+            <button type="button" class="btn btn-secondary" id="export-btn"><i data-icon="download" data-size="15"></i><span>Export CSV</span></button>
+            <a class="btn btn-primary" href="registerForm.html"><i data-icon="plus" data-size="15"></i><span>New student</span><kbd class="kbd">N</kbd></a>
+          </div>
+        </header>
 
-      <ul class="nav-links" id="nav-links">
-        <li><a href="index.html" class="nav-link active">👥 Students</a></li>
-        <li><a href="registerForm.html" class="nav-link nav-cta">➕ Register Student</a></li>
-        <li><span class="nav-user" id="nav-user"></span></li>
-        <li><button type="button" class="nav-link nav-logout" id="logout-btn">🚪 Logout</button></li>
-      </ul>
-    </div>
-  </nav>
+        <section class="stats" aria-label="Overview">
+          <article class="stat-card">
+            <div class="stat-head"><span>Total students</span><span class="stat-icon"><i data-icon="users"></i></span></div>
+            <p class="stat-value" id="stat-total">0</p>
+            <div class="split-bar" aria-hidden="true"><span class="male" id="split-male"></span><span class="female" id="split-female"></span></div>
+            <p class="stat-foot"><span class="dot dot-male"></span><span>Male</span><span class="dot dot-female"></span><span>Female</span></p>
+          </article>
+          <article class="stat-card">
+            <div class="stat-head"><span>Male students</span><span class="stat-icon male"><i data-icon="mars"></i></span></div>
+            <p class="stat-value" id="stat-male">0</p>
+            <div class="meter male" aria-hidden="true"><span id="meter-male"></span></div>
+            <p class="stat-foot" id="stat-male-share">&nbsp;</p>
+          </article>
+          <article class="stat-card">
+            <div class="stat-head"><span>Female students</span><span class="stat-icon female"><i data-icon="venus"></i></span></div>
+            <p class="stat-value" id="stat-female">0</p>
+            <div class="meter female" aria-hidden="true"><span id="meter-female"></span></div>
+            <p class="stat-foot" id="stat-female-share">&nbsp;</p>
+          </article>
+        </section>
 
-  <!-- Main Content -->
-  <main class="main-content">
-    
-    <!-- Page Header -->
-    <header class="page-header">
-      <div class="page-title">
-        <h1>Student Directory</h1>
-        <p>View, filter, edit and manage registered students in real-time</p>
-      </div>
-      <a href="registerForm.html" class="btn btn-primary">
-        <span>✨ Add New Student</span>
-      </a>
-    </header>
-
-    <!-- Stats Overview -->
-    <section class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon total">🎓</div>
-        <div class="stat-info">
-          <h3 id="stat-total">0</h3>
-          <p>Total Students</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon male">👨</div>
-        <div class="stat-info">
-          <h3 id="stat-male">0</h3>
-          <p>Male Students</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon female">👩</div>
-        <div class="stat-info">
-          <h3 id="stat-female">0</h3>
-          <p>Female Students</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Toolbar (Search & Filter) -->
-    <section class="filter-bar">
-      <select id="search-field" class="filter-select" aria-label="Search by">
-        <option value="name">Name</option>
-        <option value="nic">NIC</option>
-        <option value="id">ID</option>
-      </select>
-
-      <div class="search-box">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="search-input" placeholder="Search by name...">
-      </div>
-
-      <select id="gender-filter" class="filter-select">
-        <option value="all">All Genders</option>
-        <option value="M">Male</option>
-        <option value="F">Female</option>
-      </select>
-
-      <div class="view-toggle">
-        <button id="view-grid-btn" class="toggle-btn active" title="Grid View">📱 Grid</button>
-        <button id="view-table-btn" class="toggle-btn" title="Table View">📄 Table</button>
-      </div>
-    </section>
-
-    <!-- Container for Grid Cards -->
-    <div id="students-container">
-      <div id="students-grid" class="students-grid">
-        <!-- Student cards rendered dynamically -->
-      </div>
-
-      <!-- Container for Table View -->
-      <div id="table-view-wrapper" class="table-container">
-        <table class="custom-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Full Name</th>
-              <th>Gender</th>
-              <th>Age</th>
-              <th>NIC</th>
-              <th>Address</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="students-table-body">
-            <!-- Table rows rendered dynamically -->
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination -->
-      <div id="pagination" class="pagination" style="display: none;">
-        <button type="button" id="page-prev" class="btn btn-secondary">← Prev</button>
-        <span id="page-info" class="page-info"></span>
-        <button type="button" id="page-next" class="btn btn-secondary">Next →</button>
-      </div>
-
-      <!-- Empty State -->
-      <div id="empty-state" class="empty-state" style="display: none;">
-        <div class="empty-icon">📂</div>
-        <h3>No Students Found</h3>
-        <p>No records match your search criteria, or no students have been registered yet.</p>
-        <a href="registerForm.html" class="btn btn-primary">Register First Student</a>
-      </div>
-    </div>
-  </main>
-
-  <!-- Modal: View Student Details -->
-  <div id="details-modal" class="modal-overlay">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3>Student Profile</h3>
-        <button class="modal-close" onclick="closeModal('details-modal')">✕</button>
-      </div>
-      <div class="modal-body" id="details-modal-content">
-        <!-- Details populated dynamically -->
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="closeModal('details-modal')">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal: Edit Student -->
-  <div id="edit-modal" class="modal-overlay">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3>Edit Student Details</h3>
-        <button class="modal-close" onclick="closeModal('edit-modal')">✕</button>
-      </div>
-      <form id="edit-student-form">
-        <div class="modal-body">
-          <input type="hidden" id="edit-id">
-          
-          <div class="form-grid">
-            <div class="form-group">
-              <label class="form-label">First Name</label>
-              <input type="text" id="edit-firstName" class="form-input" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Last Name</label>
-              <input type="text" id="edit-lastName" class="form-input" required>
-            </div>
-            <div class="form-group full-width">
-              <label class="form-label">Gender</label>
-              <div class="gender-radio-group">
-                <div class="radio-pill">
-                  <input type="radio" id="edit-male" name="edit-gender" value="M" checked>
-                  <label for="edit-male">Male</label>
-                </div>
-                <div class="radio-pill">
-                  <input type="radio" id="edit-female" name="edit-gender" value="F">
-                  <label for="edit-female">Female</label>
-                </div>
+        <section class="panel" aria-label="Student directory">
+          <div class="toolbar">
+            <div class="search-group">
+              <div class="segmented" role="radiogroup" aria-label="Search by">
+                <label><input type="radio" name="search-field" value="name" checked><span>Name</span></label>
+                <label><input type="radio" name="search-field" value="nic"><span>NIC</span></label>
+                <label><input type="radio" name="search-field" value="id"><span>ID</span></label>
+              </div>
+              <div class="search-input">
+                <i data-icon="search" data-size="15"></i>
+                <input type="search" id="search-input" data-search-input placeholder="Search by first or last name…" autocomplete="off" spellcheck="false" aria-label="Search students">
+                <kbd class="kbd" aria-hidden="true">/</kbd>
+                <button type="button" class="search-clear" id="search-clear" aria-label="Clear search" hidden><i data-icon="x" data-size="14"></i></button>
               </div>
             </div>
-            <div class="form-group">
-              <label class="form-label">Age</label>
-              <input type="number" id="edit-age" class="form-input" min="1" max="120" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">NIC</label>
-              <input type="text" id="edit-nic" class="form-input" required>
-            </div>
-            <div class="form-group full-width">
-              <label class="form-label">Address</label>
-              <input type="text" id="edit-address" class="form-input" required>
+            <div class="toolbar-right">
+              <div class="segmented" role="radiogroup" aria-label="Gender">
+                <label><input type="radio" name="gender" value="" checked><span>All</span></label>
+                <label><input type="radio" name="gender" value="M"><span>Male</span></label>
+                <label><input type="radio" name="gender" value="F"><span>Female</span></label>
+              </div>
+              <div class="segmented segmented-icon" role="radiogroup" aria-label="Layout">
+                <label title="Table view"><input type="radio" name="view" value="table" aria-label="Table view"><span><i data-icon="list" data-size="15"></i></span></label>
+                <label title="Card view"><input type="radio" name="view" value="grid" aria-label="Card view"><span><i data-icon="layout-grid" data-size="15"></i></span></label>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" onclick="closeModal('edit-modal')">Cancel</button>
-          <button type="submit" class="btn btn-primary">Save Changes</button>
-        </div>
-      </form>
+          <div class="progress-line" id="progress-line" aria-hidden="true"></div>
+          <div class="results" id="results"></div>
+          <footer class="panel-footer" id="pagination" hidden></footer>
+        </section>
+      </main>
     </div>
   </div>
 
-  <!-- Modal: Delete Confirmation -->
-  <div id="delete-modal" class="modal-overlay">
-    <div class="modal-card" style="max-width: 420px;">
-      <div class="modal-header">
-        <h3>Confirm Delete</h3>
-        <button class="modal-close" onclick="closeModal('delete-modal')">✕</button>
-      </div>
-      <div class="modal-body" style="text-align: center; padding: 2rem 1.5rem;">
-        <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
-        <h4 style="margin-bottom: 0.5rem; font-size: 1.15rem;">Are you sure?</h4>
-        <p style="color: var(--text-muted); font-size: 0.9rem;">The student will be removed from the directory.</p>
-      </div>
-      <div class="modal-footer" style="justify-content: center;">
-        <button class="btn btn-secondary" onclick="closeModal('delete-modal')">Cancel</button>
-        <button class="btn btn-danger" onclick="executeDeleteStudent()">Yes, Delete Student</button>
-      </div>
-    </div>
+  <!-- Student drawer: profile, edit and delete -->
+  <div class="overlay" id="student-drawer" hidden>
+    <aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+      <header class="drawer-header">
+        <h2 id="drawer-title">Student profile</h2>
+        <button type="button" class="btn btn-ghost btn-icon btn-sm" data-close aria-label="Close"><i data-icon="x"></i></button>
+      </header>
+      <div class="drawer-body" id="drawer-body"></div>
+      <footer class="drawer-footer" id="drawer-footer"></footer>
+    </aside>
   </div>
 
+  <script src="js/icons.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/students.js"></script>
 </body>
 </html>
