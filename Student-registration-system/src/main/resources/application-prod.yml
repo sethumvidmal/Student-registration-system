@@ -1,8 +1,10 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/institute_crm
-    username: root
-    password: ICET@1234
+    # MariaDB server. Override per environment with DB_HOST, DB_PORT, DB_NAME, DB_USERNAME and DB_PASSWORD.
+    # Hibernate detects the MariaDB dialect from the connection, so none is configured here.
+    url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:institute_crm}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:ICET@1234}
   jpa:
     hibernate:
       ddl-auto: update
