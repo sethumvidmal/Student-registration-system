@@ -934,3 +934,51 @@ a {
     width: 100%;
   }
 }
+
+/* Authentication */
+.nav-user {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0 0.5rem;
+}
+
+.nav-logout {
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.nav-logout:hover {
+  color: var(--accent-rose);
+  border-color: rgba(244, 63, 94, 0.4);
+}
+
+.login-container {
+  max-width: 420px;
+  margin-top: 3rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.login-submit {
+  width: 100%;
+  padding: 0.8rem;
+  font-size: 0.95rem;
+}
+
+.login-submit:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.form-error {
+  color: var(--accent-rose);
+  font-size: 0.85rem;
+  min-height: 1.25rem;
+}

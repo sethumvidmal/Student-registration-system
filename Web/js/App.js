@@ -1,6 +1,7 @@
 /**
  * Student Registration System - Frontend App Logic
  * Backend URL: http://localhost:8080/student
+ * API calls go through authFetch() from auth.js, which adds the JWT.
  */
 
 const API_BASE_URL = "http://localhost:8080/student";
@@ -107,7 +108,7 @@ function initDirectoryPage() {
 async function loadStudents() {
   showSkeletons();
   try {
-    const response = await fetch(API_BASE_URL);
+    const response = await authFetch(API_BASE_URL);
     if (!response.ok) throw new Error("Failed to fetch students");
     const data = await response.json();
     studentsList = Array.isArray(data) ? data : [];
@@ -258,7 +259,7 @@ function showSkeletons() {
    ========================================== */
 async function viewStudentDetails(id) {
   try {
-    const res = await fetch(`${API_BASE_URL}/${id}`);
+    const res = await authFetch(`${API_BASE_URL}/${id}`);
     if (!res.ok) throw new Error("Could not fetch details");
     const data = await res.json();
     const student = Array.isArray(data) ? data[0] : data;
@@ -344,7 +345,7 @@ async function handleUpdateStudent(e) {
   const updatedStudent = { id, firstName, lastName, gender, age, nic, address };
 
   try {
-    const res = await fetch(API_BASE_URL, {
+    const res = await authFetch(API_BASE_URL, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedStudent)
@@ -369,7 +370,7 @@ async function executeDeleteStudent() {
   if (!currentDeleteId) return;
 
   try {
-    const res = await fetch(`${API_BASE_URL}/${currentDeleteId}`, {
+    const res = await authFetch(`${API_BASE_URL}/${currentDeleteId}`, {
       method: "DELETE"
     });
 
@@ -420,7 +421,7 @@ async function handleRegisterStudent(e) {
   }
 
   try {
-    const res = await fetch(API_BASE_URL, {
+    const res = await authFetch(API_BASE_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newStudent)

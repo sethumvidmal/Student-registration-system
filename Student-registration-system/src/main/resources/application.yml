@@ -1,3 +1,18 @@
 spring :
   profiles :
     active : dev
+
+jwt:
+  # Override both secrets via environment variables outside local dev (min 32 chars each)
+  secret: ${JWT_SECRET:dev-access-secret-change-me-0123456789abcdef}
+  refresh-secret: ${REFRESH_JWT_SECRET:dev-refresh-secret-change-me-0123456789abcdef}
+  access-expiration: ${JWT_ACCESS_EXPIRATION:15m}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:7d}
+
+seed:
+  super-admin:
+    first-name: Super
+    last-name: Admin
+    email: ${SEED_ADMIN_EMAIL:superadmin@icet.lk}
+    phone: ${SEED_ADMIN_PHONE:94712345678}
+    password: ${SEED_ADMIN_PASSWORD:Admin@1234}

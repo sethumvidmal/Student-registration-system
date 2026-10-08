@@ -48,9 +48,14 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public void updateStudent(StudentDTO studentDTO) {
-        if (studentDTO.getId() != 0 && studentRepository.existsById(studentDTO.getId())) {
-            studentRepository.save(modelMapper.map(studentDTO, StudentEntity.class));
+        if (studentDTO.getId() == 0) {
+            return;
         }
+        // Map onto the loaded entity so audit columns and version are preserved
+        studentRepository.findById(studentDTO.getId()).stream().findFirst().ifPresent(student -> {
+            modelMapper.map(studentDTO, student);
+            studentRepository.save(student);
+        });
     }
 }
 
